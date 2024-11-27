@@ -49,3 +49,11 @@
     challenge-bond: uint
   }
 )
+
+;; Contract Owner (Deployer)
+(define-data-var contract-owner principal tx-sender)
+
+;; Validation Functions
+(define-private (is-valid-principal (addr principal))
+  (not (is-eq addr tx-sender))
+)
