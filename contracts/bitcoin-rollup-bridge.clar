@@ -28,3 +28,24 @@
     root-hash: (buff 32)
   }
 )
+
+;; Tracking user balances on the rollup
+(define-map user-balances 
+  { 
+    user: principal, 
+    token-identifier: uint 
+  } 
+  uint
+)
+
+;; Challenges and Dispute Tracking
+(define-map challenges 
+  { 
+    challenge-block: uint, 
+    challenger: principal 
+  } 
+  {
+    commitment-hash: (buff 32),
+    challenge-bond: uint
+  }
+)
