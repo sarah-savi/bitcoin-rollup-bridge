@@ -87,3 +87,53 @@
     (ok true)
   )
 )
+
+;; Submit State Commitment with Enhanced Validation
+(define-public (submit-state-commitment 
+  (commitment-block uint)
+  (commitment-hash (buff 32))
+  (total-transactions uint)
+  (total-value uint)
+  (root-hash (buff 32))
+)
+  (let 
+    (
+      (operator-status 
+        (map-get? operators tx-sender)
+      )
+    )
+    ;; Comprehensive input validation
+    (asserts! (is-some operator-status) ERR_INVALID_OPERATOR)
+    (asserts! 
+      (match operator-status 
+        status 
+        (get is-active status) 
+        false
+      ) 
+      ERR_INVALID_OPERATOR
+    )
+    (asserts! (is-valid-uint commitment-block) ERR_INVALID_INPUT)
+    (asserts! (is-valid-commitment-hash commitment-hash) ERR_INVALID_INPUT)
+    (asserts! (is-valid-uint total-transactions) ERR_INVALID_INPUT)
+    (asserts! (is-valid-uint total-value) ERR_INVALID_INPUT)
+    (asserts! (is-valid-commitment-hash root-hash) ERR_INVALID_INPUT)
+    
+    ;; Require a minimum stake/bond
+    (try! (stx-transfer? u1000 tx-sender (as-contract tx-sender)))
+    
+    ;; Store the commitment with validated inputs
+    (map-set state-commitments 
+      { 
+        commitment-block: commitment-block, 
+        commitment-hash: commitment-hash 
+      }
+      {
+        total-transactions: total-transactions,
+        total-value: total-value,
+        root-hash: root-hash
+      }
+    )
+    
+    (ok true)
+  )
+)
