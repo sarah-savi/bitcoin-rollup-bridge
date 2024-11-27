@@ -10,3 +10,21 @@
 (define-constant ERR_INSUFFICIENT_FUNDS (err u5))
 (define-constant ERR_INVALID_INPUT (err u6))
 (define-constant ERR_UNAUTHORIZED (err u7))
+
+;; Storage for Operators and State
+(define-map operators 
+  principal 
+  { is-active: bool }
+)
+
+(define-map state-commitments 
+  { 
+    commitment-block: uint, 
+    commitment-hash: (buff 32) 
+  } 
+  {
+    total-transactions: uint,
+    total-value: uint,
+    root-hash: (buff 32)
+  }
+)
