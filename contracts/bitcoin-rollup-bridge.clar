@@ -137,3 +137,45 @@
     (ok true)
   )
 )
+
+;; Challenge a State Commitment
+(define-public (challenge-commitment 
+  (challenge-block uint)
+  (commitment-hash (buff 32))
+  (challenge-proof (buff 256))
+)
+  (let 
+    (
+      (challenge-bond u500)
+      (existing-commitment 
+        (map-get? state-commitments 
+          { 
+            commitment-block: challenge-block, 
+            commitment-hash: commitment-hash 
+          }
+        )
+      )
+    )
+    ;; Enhanced validation
+    (asserts! (is-valid-uint challenge-block) ERR_INVALID_INPUT)
+    (asserts! (is-valid-commitment-hash commitment-hash) ERR_INVALID_INPUT)
+    (asserts! (is-some existing-commitment) ERR_INVALID_COMMITMENT)
+    
+    ;; Transfer challenge bond
+    (try! (stx-transfer? challenge-bond tx-sender (as-contract tx-sender)))
+    
+    ;; Record challenge with validated inputs
+    (map-set challenges 
+      { 
+        challenge-block: challenge-block, 
+        challenger: tx-sender 
+      }
+      {
+        commitment-hash: commitment-hash,
+        challenge-bond: challenge-bond
+      }
+    )
+    
+    (ok true)
+  )
+)
