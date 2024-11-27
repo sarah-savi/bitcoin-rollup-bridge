@@ -57,3 +57,11 @@
 (define-private (is-valid-principal (addr principal))
   (not (is-eq addr tx-sender))
 )
+
+(define-private (is-valid-uint (value uint))
+  (> value u0)
+)
+
+(define-private (is-valid-commitment-hash (hash (buff 32)))
+  (> (len hash) u0)
+)
