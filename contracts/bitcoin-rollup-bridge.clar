@@ -65,3 +65,25 @@
 (define-private (is-valid-commitment-hash (hash (buff 32)))
   (> (len hash) u0)
 )
+
+;; Operator Registration
+(define-public (register-operator)
+  (begin
+    ;; Prevent duplicate registrations and self-registration
+    (asserts! 
+      (and 
+        (is-none (map-get? operators tx-sender))
+        (is-eq tx-sender (var-get contract-owner))
+      ) 
+      ERR_UNAUTHORIZED
+    )
+    
+    ;; Register operator
+    (map-set operators 
+      tx-sender 
+      { is-active: true }
+    )
+    
+    (ok true)
+  )
+)
