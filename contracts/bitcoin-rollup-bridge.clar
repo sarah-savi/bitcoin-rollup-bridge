@@ -354,3 +354,15 @@
     (ok true)
   )
 )
+
+;; Read-only function to get user balance
+(define-read-only (get-user-balance (user principal) (token-identifier uint))
+  (default-to u0 
+    (map-get? user-balances 
+      { 
+        user: user, 
+        token-identifier: token-identifier 
+      }
+    )
+  )
+)
