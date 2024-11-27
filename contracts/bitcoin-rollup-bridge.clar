@@ -250,3 +250,72 @@
     )
   )
 )
+
+;; Simplified Merkle Proof Validation
+(define-private (validate-merkle-proof (proof (buff 256)))
+  
+  (> (len proof) u10)
+)
+
+;; Internal Transfer within Rollup
+(define-public (transfer-in-rollup 
+  (from principal)
+  (to principal)
+  (amount uint)
+  (token-identifier uint)
+)
+  (begin
+    ;; Input validation
+    (asserts! (is-valid-principal from) ERR_INVALID_INPUT)
+    (asserts! (is-valid-principal to) ERR_INVALID_INPUT)
+    (asserts! (is-valid-uint amount) ERR_INVALID_INPUT)
+    (asserts! (is-valid-uint token-identifier) ERR_INVALID_INPUT)
+    
+    ;; Perform transfer logic
+    (let 
+      (
+        (sender-balance 
+          (default-to u0 
+            (map-get? user-balances 
+              { 
+                user: from, 
+                token-identifier: token-identifier 
+              }
+            )
+          )
+        )
+        (recipient-balance 
+          (default-to u0 
+            (map-get? user-balances 
+              { 
+                user: to, 
+                token-identifier: token-identifier 
+              }
+            )
+          )
+        )
+      )
+      ;; Validate sender has sufficient balance
+      (asserts! (>= sender-balance amount) ERR_INSUFFICIENT_FUNDS)
+      
+      ;; Update balances
+      (map-set user-balances 
+        { 
+          user: from, 
+          token-identifier: token-identifier 
+        } 
+        (- sender-balance amount)
+      )
+      
+      (map-set user-balances 
+        { 
+          user: to, 
+          token-identifier: token-identifier 
+        } 
+        (+ recipient-balance amount)
+      )
+    )
+    
+    (ok true)
+  )
+)
